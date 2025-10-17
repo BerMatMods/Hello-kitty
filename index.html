@@ -1,0 +1,250 @@
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello Kithy 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Dancing Script', cursive;
+      background: url('https://i.postimg.cc/yY4MJzKg/1ed41955d579452f11a2e7f5a9267246.jpg') center/cover no-repeat fixed;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      color: white;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      filter: blur(10px) brightness(0.7);
+      z-index: -2;
+    }
+
+    .message-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(10px);
+      border-radius: 22px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow:
+        0 0 18px rgba(255, 105, 180, 0.8),
+        0 0 34px rgba(255, 105, 180, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      z-index: 10;
+      max-width: 90%;
+      width: 580px;
+      position: relative;
+    }
+
+    /* Título grande */
+    .title {
+      font-size: 3.4rem;
+      font-weight: bold;
+      margin-bottom: 18px;
+      text-shadow:
+        0 0 8px #ffffff,
+        0 0 16px #ffffff,
+        0 0 24px #ffffff;
+      color: #fff;
+      font-family: 'Pacifico', cursive;
+      letter-spacing: 1px;
+    }
+
+    .message {
+      font-size: 1.85rem;
+      line-height: 1.6;
+      color: #fff;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+    }
+
+    .corner-deco {
+      position: absolute;
+      top: -18px;
+      right: -18px;
+      width: 105px;
+      height: auto;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    #follower-astronaut {
+      position: absolute;
+      width: 130px;
+      height: auto;
+      pointer-events: none;
+      z-index: 5;
+      animation: floatSpace 3s ease-in-out infinite;
+    }
+
+    @keyframes floatSpace {
+      0%, 100% { transform: translateY(0) rotate(0.4deg); }
+      50% { transform: translateY(-10px) rotate(-0.4deg); }
+    }
+
+    /* Partículas BLANCAS tipo fuego brillante */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 4;
+      opacity: 1;
+      background-color: white;
+      box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    .credits {
+      position: absolute;
+      bottom: 22px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+      font-size: 1.5rem;
+      color: white;
+      text-shadow:
+        0 0 6px #ff66ff,
+        0 0 12px #ff66ff,
+        0 0 18px #ff66ff;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .credits::after {
+      content: ' ✨';
+      animation: sparkle 1.8s infinite alternate;
+    }
+
+    @keyframes sparkle {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="message-box">
+    <div class="title">Te amo</div>
+    <div class="message">Te amo con el alma, mi reina. No hay distancia ni tiempo que cambie lo que siento por ti, porque tú eres mi destino y mi razón para seguir adelante 💕🌙</div>
+    <img src="https://i.postimg.cc/7P2vYZFL/1760657847691-removebg-preview.png" class="corner-deco" alt="Hello Kathy">
+  </div>
+
+  <div class="credits">By AnthZz Berrocal BerMatMods</div>
+
+  <img id="follower-astronaut" src="https://i.postimg.cc/vHFJ1dyW/1760657793625-removebg-preview.png" alt="Hello Kathy Seguidora">
+
+  <script>
+    let targetX = 50;
+    let targetY = 50;
+    let lastX = 40;
+    let lastY = 60;
+
+    const follower = document.getElementById('follower-astronaut');
+    follower.style.left = lastX + 'vw';
+    follower.style.top = lastY + 'vh';
+
+    function updateTarget(e, isTouch = false) {
+      const rect = document.body.getBoundingClientRect();
+      if (isTouch && e.touches && e.touches[0]) {
+        const touch = e.touches[0];
+        targetX = ((touch.clientX - rect.left) / rect.width) * 100;
+        targetY = ((touch.clientY - rect.top) / rect.height) * 100;
+      } else {
+        targetX = ((e.clientX - rect.left) / rect.width) * 100;
+        targetY = ((e.clientY - rect.top) / rect.height) * 100;
+      }
+    }
+
+    document.body.addEventListener('mousemove', (e) => updateTarget(e, false));
+    document.body.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      updateTarget(e, true);
+    }, { passive: false });
+
+    function createParticles(dx, dy) {
+      const count = 5 + Math.floor(Math.random() * 4); // 5 a 8 partículas
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+
+        const rect = follower.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        // Tamaño GRANDE: 12px a 24px
+        const size = 12 + Math.random() * 12;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+
+        document.body.appendChild(particle);
+
+        // Dirección opuesta al movimiento
+        const angle = Math.atan2(dy, dx) + Math.PI;
+        const speed = 1.8 + Math.random() * 3;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+
+        let x = centerX;
+        let y = centerY;
+        let opacity = 1;
+        let life = 45;
+
+        function animateParticle() {
+          if (life <= 0 || opacity <= 0) {
+            particle.remove();
+            return;
+          }
+
+          x += vx + (Math.random() - 0.5) * 1.5;
+          y += vy + (Math.random() - 0.5) * 1.5;
+          opacity -= 0.022;
+          life--;
+
+          particle.style.left = x + 'px';
+          particle.style.top = y + 'px';
+          particle.style.opacity = opacity;
+
+          requestAnimationFrame(animateParticle);
+        }
+
+        animateParticle();
+      }
+    }
+
+    function animate() {
+      const dx = targetX - lastX;
+      const dy = targetY - lastY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > 0.6) {
+        createParticles(dx, dy);
+      }
+
+      lastX += dx * 0.08;
+      lastY += dy * 0.08;
+
+      follower.style.left = lastX + 'vw';
+      follower.style.top = lastY + 'vh';
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
