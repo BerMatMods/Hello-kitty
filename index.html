@@ -1,10 +1,11 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Hello Kithy 💖</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&family=Roboto+Mono&family=Orbitron&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
       margin: 0;
@@ -14,7 +15,7 @@
 
     body {
       font-family: 'Dancing Script', cursive;
-      background: url('https://i.postimg.cc/L8YvR4fr/0e5563a1d80e8407b610e74c3ebec21b.jpg') center/cover no-repeat fixed;
+      background: url('https://i.postimg.cc/MGDJR6bd/b6a08feba2f3066c64ba9838a655acbd.jpg') center/cover no-repeat fixed;
       height: 100vh;
       overflow: hidden;
       position: relative;
@@ -34,7 +35,320 @@
       z-index: -2;
     }
 
-    /* Botón de sonido */
+    /* === 🔋 Indicador de Batería - ESQUINA SUPERIOR IZQUIERDA (FIJO) === */
+    #battery-indicator {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      z-index: 100;
+      backdrop-filter: blur(3px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      pointer-events: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .battery-icon {
+      position: relative;
+      width: 18px;
+      height: 10px;
+      border: 1.5px solid #fff;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      padding: 1px;
+    }
+
+    .battery-icon::after {
+      content: '';
+      position: absolute;
+      right: -3px;
+      width: 2px;
+      height: 4px;
+      background: #fff;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .battery-level {
+      height: 100%;
+      background: #4ade80;
+      border-radius: 1px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    .battery-level.low { background: #f87171; }
+    .battery-level.medium { background: #fbbf24; }
+    .battery-level.high { background: #4ade80; }
+
+    .charging-icon {
+      font-size: 0.8rem;
+      color: #fbbf24;
+      animation: pulse 1s infinite;
+      display: none;
+    }
+
+    .charging-icon.active { 
+      display: inline-block; 
+      animation: pulse 0.6s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.9); }
+    }
+
+    /* === ☰ Menú Hamburguesa - ESQUINA SUPERIOR DERECHA === */
+    #menu-toggle {
+      position: absolute;
+      top: 15px;
+      right: 12px;
+      width: 36px;
+      height: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 100;
+      padding: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(3px);
+      transition: all 0.3s ease;
+    }
+
+    #menu-toggle:hover {
+      background: rgba(255, 105, 180, 0.3);
+      transform: scale(1.05);
+    }
+
+    .hamburger-line {
+      width: 100%;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    #menu-toggle.active .hamburger-line:nth-child(1) {
+      transform: rotate(45deg) translate(7px, 7px);
+    }
+    #menu-toggle.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+    #menu-toggle.active .hamburger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    /* Panel del menú - Se abre desde la DERECHA */
+    #menu-panel {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(135deg, rgba(20, 10, 30, 0.95), rgba(40, 20, 50, 0.95));
+      backdrop-filter: blur(10px);
+      padding: 60px 20px 20px;
+      z-index: 99;
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 1px solid rgba(255, 105, 180, 0.3);
+      box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+    }
+
+    #menu-panel.active { right: 0; }
+
+    #menu-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at top, rgba(255, 105, 180, 0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    .menu-header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.6rem;
+      color: #ff69b4;
+      text-shadow: 0 0 10px rgba(255, 105, 180, 0.6);
+      margin-bottom: 5px;
+    }
+
+    .menu-version {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .menu-section { margin-bottom: 25px; }
+
+    .menu-section-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.1rem;
+      color: #ffb6c1;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-section-title i {
+      font-size: 1rem;
+      color: #ff69b4;
+    }
+
+    .menu-item {
+      padding: 10px 15px;
+      margin: 5px 0;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+
+    .menu-item:hover {
+      background: rgba(255, 105, 180, 0.2);
+      transform: translateX(-3px);
+    }
+
+    .menu-item i {
+      width: 20px;
+      text-align: center;
+      color: #ff69b4;
+    }
+
+    /* Redes sociales */
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .social-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: white;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .social-icon:hover::before { left: 100%; }
+
+    .social-icon.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .social-icon.tiktok { background: linear-gradient(45deg, #00f2ea, #ff0050); }
+    .social-icon.whatsapp { background: #25D366; }
+    .social-icon.facebook { background: #1877F2; }
+    .social-icon.twitter { background: #1DA1F2; }
+
+    .social-icon:hover {
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 5px 15px rgba(255, 105, 180, 0.5);
+    }
+
+    .menu-footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Overlay para cerrar menú */
+    #menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 98;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+
+    #menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* === 💖 Partículas de Corazones === */
+    .heart-particle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+      font-size: 1rem;
+      animation: floatHeart linear forwards;
+      text-shadow: 0 0 8px rgba(255, 105, 180, 0.8), 0 0 15px rgba(255, 105, 180, 0.5);
+      opacity: 0;
+    }
+
+    @keyframes floatHeart {
+      0% {
+        transform: translate(0, 0) scale(0.3) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      50% { opacity: 0.9; }
+      100% {
+        transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
+
+    /* === 🔊 Botón de sonido === */
     #sound-toggle {
       position: absolute;
       bottom: 100px;
@@ -52,9 +366,15 @@
       backdrop-filter: blur(4px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 0 6px rgba(255, 105, 180, 0.5);
+      transition: all 0.3s ease;
     }
 
-    /* Créditos más pequeños */
+    #sound-toggle:hover {
+      background: rgba(255, 105, 180, 0.3);
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    /* === Créditos === */
     .credits {
       position: absolute;
       bottom: 70px;
@@ -63,14 +383,18 @@
       font-family: 'Pacifico', cursive;
       font-size: 0.9rem;
       color: white;
-      text-shadow:
-        0 0 3px #ff66ff,
-        0 0 6px #ff66ff;
+      text-shadow: 0 0 3px #ff66ff, 0 0 6px #ff66ff;
       z-index: 20;
       pointer-events: none;
+      animation: pulse 2s infinite;
     }
 
-    /* Resto del estilo original */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* === Caja de mensaje === */
     .message-box {
       position: absolute;
       top: 50%;
@@ -81,9 +405,7 @@
       border-radius: 16px;
       padding: 18px 16px;
       text-align: center;
-      box-shadow:
-        0 0 10px rgba(255, 105, 180, 0.6),
-        0 0 20px rgba(255, 105, 180, 0.4);
+      box-shadow: 0 0 10px rgba(255, 105, 180, 0.6), 0 0 20px rgba(255, 105, 180, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.2);
       z-index: 10;
       max-width: 85%;
@@ -94,13 +416,16 @@
       font-size: 2rem;
       font-weight: bold;
       margin-bottom: 10px;
-      text-shadow:
-        0 0 5px #ffffff,
-        0 0 10px #ffffff,
-        0 0 15px #ffffff;
+      text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff;
       color: #fff;
       font-family: 'Pacifico', cursive;
       letter-spacing: 0.5px;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff69b4; }
+      to { text-shadow: 0 0 10px #fff, 0 0 20px #ff69b4, 0 0 30px #ff1493; }
     }
 
     .message {
@@ -133,6 +458,7 @@
       pointer-events: none;
       z-index: 15;
       animation: floatSpace 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.8));
     }
 
     @keyframes floatSpace {
@@ -153,10 +479,69 @@
 </head>
 <body>
 
-  <!-- Botón de sonido -->
-  <button id="sound-toggle">Activar sonido</button>
+  <!-- 🔋 Indicador de Batería - ESQUINA SUPERIOR IZQUIERDA (FIJO) -->
+  <div id="battery-indicator">
+    <div class="battery-icon">
+      <div class="battery-level high" id="battery-level"></div>
+    </div>
+    <span id="battery-percent">--%</span>
+    <i class="fas fa-bolt charging-icon" id="charging-icon" title="Cargando"></i>
+  </div>
 
-  <!-- Mensaje principal -->
+  <!-- ☰ Menú Hamburguesa - ESQUINA SUPERIOR DERECHA -->
+  <div id="menu-toggle" aria-label="Abrir menú">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+  </div>
+
+  <!-- 📱 Panel del Menú - Se abre desde la DERECHA -->
+  <div id="menu-panel">
+    <div class="menu-header">
+      <div class="menu-title">💖 Hello Kithy</div>
+      <div class="menu-version">v2.1.0 ✨ BerMat-Code</div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-title"><i class="fas fa-info-circle"></i> Info de la App</div>
+      <div class="menu-item"><i class="fas fa-code"></i> Creado con HTML5 + CSS3 + JS</div>
+      <div class="menu-item"><i class="fas fa-palette"></i> Diseño romántico personalizado</div>
+      <div class="menu-item"><i class="fas fa-music"></i> Música de fondo integrada</div>
+      <div class="menu-item"><i class="fas fa-heart"></i> Hecho con amor para ti</div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-title"><i class="fas fa-gift"></i> Para Briyidth</div>
+      <div class="menu-item"><i class="fas fa-user-heart"></i> Mi persona especial 💕</div>
+      <div class="menu-item"><i class="fas fa-star"></i> Eres mi razón de sonreír</div>
+      <div class="menu-item"><i class="fas fa-infinity"></i> Te amo por siempre</div>
+      <div class="menu-item"><i class="fas fa-moon"></i> Mi goldita hermosa 🌙</div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-title"><i class="fas fa-share-alt"></i> Redes Sociales</div>
+      <div class="social-icons">
+        <div class="social-icon instagram" title="Instagram"><i class="fab fa-instagram"></i></div>
+        <div class="social-icon tiktok" title="TikTok"><i class="fab fa-tiktok"></i></div>
+        <div class="social-icon whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></div>
+        <div class="social-icon facebook" title="Facebook"><i class="fab fa-facebook-f"></i></div>
+        <div class="social-icon twitter" title="X/Twitter"><i class="fab fa-twitter"></i></div>
+      </div>
+    </div>
+
+    <div class="menu-footer">
+      <div>𖤍 BerMat-Code 𖤍</div>
+      <div style="margin-top:5px;font-size:0.75rem;">© 2026 • Hecho con 💖</div>
+    </div>
+  </div>
+
+  <!-- Overlay para cerrar menú -->
+  <div id="menu-overlay"></div>
+
+  <!-- 🔊 Botón de sonido -->
+  <button id="sound-toggle">🔇 Tocar para activar sonido</button>
+
+  <!-- 💌 Mensaje principal -->
   <div class="message-box">
     <div class="title">🌹Mi Yorchi🥵</div>
     <div class="message">Te amo con el alma, mi reina. No hay distancia ni tiempo que cambie lo que siento por ti, porque tú eres mi destino y mi razón para seguir adelante mi goldita hermosa 💕🌙</div>
@@ -169,57 +554,195 @@
   <img id="follower-astronaut" src="https://i.postimg.cc/vHFJ1dyW/1760657793625-removebg-preview.png" alt="Hello Kathy Seguidora">
 
   <!-- Audios -->
-  <audio id="bg-music" src="https://files.catbox.moe/012lzs.mp3" preload="auto"></audio>
+  <audio id="bg-music" preload="auto" loop></audio>
   <audio id="click-sound" src="https://files.catbox.moe/deprpa.mp3" preload="auto"></audio>
 
   <script>
-    // --- Lógica de sonido (simplificada sin referencias al menú) ---
+    // === 🔋 SISTEMA DE BATERÍA - ESQUINA IZQUIERDA (FIJO) ===
+    async function initBattery() {
+      const batteryLevel = document.getElementById('battery-level');
+      const batteryPercent = document.getElementById('battery-percent');
+      const chargingIcon = document.getElementById('charging-icon');
+      
+      function updateBatteryUI(level, charging) {
+        const percent = Math.round(level * 100);
+        batteryPercent.textContent = percent + '%';
+        batteryLevel.style.width = percent + '%';
+        
+        batteryLevel.className = 'battery-level';
+        if (percent <= 20) batteryLevel.classList.add('low');
+        else if (percent <= 50) batteryLevel.classList.add('medium');
+        else batteryLevel.classList.add('high');
+        
+        if (charging) {
+          chargingIcon.classList.add('active');
+          chargingIcon.style.display = 'inline-block';
+        } else {
+          chargingIcon.classList.remove('active');
+          chargingIcon.style.display = 'none';
+        }
+      }
+
+      if ('getBattery' in navigator) {
+        try {
+          const battery = await navigator.getBattery();
+          updateBatteryUI(battery.level, battery.charging);
+          
+          battery.addEventListener('levelchange', () => {
+            updateBatteryUI(battery.level, battery.charging);
+          });
+          battery.addEventListener('chargingchange', () => {
+            updateBatteryUI(battery.level, battery.charging);
+          });
+          return;
+        } catch (e) {
+          console.log('Battery API no disponible');
+        }
+      }
+      
+      // Fallback decorativo
+      const fallbackLevel = 0.75 + Math.random() * 0.2;
+      updateBatteryUI(fallbackLevel, false);
+    }
+
+    // === ☰ MENÚ HAMBURGUESA - DESDE LA DERECHA ===
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuPanel = document.getElementById('menu-panel');
+    const menuOverlay = document.getElementById('menu-overlay');
+
+    function toggleMenu() {
+      const isActive = menuPanel.classList.toggle('active');
+      menuToggle.classList.toggle('active', isActive);
+      menuOverlay.classList.toggle('active', isActive);
+      
+      if (isActive && musicPlayed && !isMuted) {
+        clickSound.currentTime = 0;
+        clickSound.play().catch(() => {});
+      }
+    }
+
+    menuToggle.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menuPanel.classList.contains('active')) {
+        toggleMenu();
+      }
+    });
+
+    // === 💖 CORAZONES PARTICULAS ===
+    function createHeartParticle() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart-particle');
+      heart.innerHTML = '💖';
+      
+      const startX = Math.random() * 100;
+      const endX = (Math.random() - 0.5) * 60;
+      const endY = -(Math.random() * 80 + 40);
+      
+      heart.style.setProperty('--tx', endX + 'vw');
+      heart.style.setProperty('--ty', endY + 'vh');
+      heart.style.setProperty('--rot', (Math.random() - 0.5) * 720 + 'deg');
+      
+      heart.style.left = startX + 'vw';
+      heart.style.top = '100vh';
+      
+      const size = 0.8 + Math.random() * 1.2;
+      heart.style.fontSize = size + 'rem';
+      
+      const duration = 3 + Math.random() * 4;
+      heart.style.animationDuration = duration + 's';
+      
+      document.body.appendChild(heart);
+      
+      setTimeout(() => heart.remove(), duration * 1000);
+    }
+
+    function startHeartParticles() {
+      setInterval(() => {
+        if (Math.random() > 0.3) createHeartParticle();
+      }, 300 + Math.random() * 300);
+      
+      for (let i = 0; i < 8; i++) {
+        setTimeout(() => createHeartParticle(), i * 150);
+      }
+    }
+
+    // === 🔊 LÓGICA DE SONIDO - SIN "REINTENTAR" ===
     const bgMusic = document.getElementById('bg-music');
     const clickSound = document.getElementById('click-sound');
     const soundToggle = document.getElementById('sound-toggle');
 
+    const audioURL = 'https://raw.githubusercontent.com/BerMatMods/Hello-kitty/refs/heads/main/TikVid.io_7289423782995889414%20(1).mp3';
+    bgMusic.src = audioURL;
+
     let musicPlayed = false;
     let isMuted = false;
+    let isAudioLoading = false;
 
-    function playSounds() {
+    async function playSounds() {
+      if (isAudioLoading) return;
+      
       if (!musicPlayed) {
-        setTimeout(() => {
+        isAudioLoading = true;
+        soundToggle.textContent = "⏳ Cargando...";
+        soundToggle.disabled = true;
+        
+        try {
+          await bgMusic.load();
           bgMusic.volume = 0.6;
           bgMusic.loop = true;
-          bgMusic.play().catch(e => console.log("Reproducción bloqueada:", e));
-        }, 100);
-        musicPlayed = true;
-        soundToggle.textContent = "Desactivar sonido";
+          await bgMusic.play();
+          
+          musicPlayed = true;
+          soundToggle.textContent = "🔊 Desactivar sonido";
+          soundToggle.disabled = false;
+          
+          startHeartParticles();
+          
+          if (!isMuted) {
+            clickSound.currentTime = 0;
+            clickSound.volume = 0.7;
+            clickSound.play().catch(() => {});
+          }
+        } catch (error) {
+          console.error("Error de audio:", error);
+          // ✅ SIN "REINTENTAR" - Solo muestra error
+          soundToggle.textContent = "🔊 Sonido no disponible";
+          soundToggle.disabled = false;
+        }
+        isAudioLoading = false;
+        return;
       }
 
-      if (!isMuted) {
+      if (!isMuted && musicPlayed) {
         clickSound.currentTime = 0;
         clickSound.volume = 0.7;
-        clickSound.play().catch(e => console.log("Error clic:", e));
+        clickSound.play().catch(() => {});
       }
     }
 
     function toggleSound() {
+      if (!musicPlayed) { playSounds(); return; }
       isMuted = !isMuted;
-      soundToggle.textContent = isMuted ? "Activar sonido" : "Desactivar sonido";
       bgMusic.muted = isMuted;
+      soundToggle.textContent = isMuted ? "🔇 Activar sonido" : "🔊 Desactivar sonido";
+      soundToggle.style.transform = 'translateX(-50%) scale(1.1)';
+      setTimeout(() => {
+        soundToggle.style.transform = 'translateX(-50%)';
+      }, 150);
     }
 
-    document.body.addEventListener('click', playSounds);
-    document.body.addEventListener('touchstart', playSounds, { passive: true });
-
+    document.body.addEventListener('click', playSounds, { once: true });
+    document.body.addEventListener('touchstart', playSounds, { once: true, passive: true });
     soundToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleSound();
     });
 
-    // === Astronauta y partículas (sin cambios) ===
-    let particleMode = 'normal'; // Se mantiene por compatibilidad con la lógica de partículas
+    // === 👨‍🚀 ASTRONAUTA SEGUIDOR ===
     let followSpeed = 0.08;
-    let targetX = 50;
-    let targetY = 50;
-    let lastX = 40;
-    let lastY = 60;
+    let targetX = 50, targetY = 50;
+    let lastX = 40, lastY = 60;
 
     const follower = document.getElementById('follower-astronaut');
     follower.style.left = lastX + 'vw';
@@ -227,10 +750,9 @@
 
     function updateTarget(e, isTouch = false) {
       const rect = document.body.getBoundingClientRect();
-      if (isTouch && e.touches && e.touches[0]) {
-        const touch = e.touches[0];
-        targetX = ((touch.clientX - rect.left) / rect.width) * 100;
-        targetY = ((touch.clientY - rect.top) / rect.height) * 100;
+      if (isTouch && e.touches?.[0]) {
+        targetX = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
+        targetY = ((e.touches[0].clientY - rect.top) / rect.height) * 100;
       } else {
         targetX = ((e.clientX - rect.left) / rect.width) * 100;
         targetY = ((e.clientY - rect.top) / rect.height) * 100;
@@ -238,81 +760,60 @@
     }
 
     document.body.addEventListener('mousemove', (e) => updateTarget(e, false));
-    document.body.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      updateTarget(e, true);
-    }, { passive: false });
+    document.body.addEventListener('touchmove', (e) => updateTarget(e, true), { passive: true });
 
     function createParticles(dx, dy) {
-      let count = 3;
-      if (particleMode === 'more') count = 6;
-      if (particleMode === 'max') count = 10;
-
+      const count = 3;
       for (let i = 0; i < count; i++) {
         const particle = document.createElement('div');
         particle.classList.add('particle');
-
         const rect = follower.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-
         const size = 6 + Math.random() * 6;
         particle.style.width = size + 'px';
         particle.style.height = size + 'px';
-
         document.body.appendChild(particle);
-
         const angle = Math.atan2(dy, dx) + Math.PI;
         const speed = 1 + Math.random() * 2;
         const vx = Math.cos(angle) * speed;
         const vy = Math.sin(angle) * speed;
-
-        let x = centerX;
-        let y = centerY;
-        let opacity = 1;
-        let life = 30 + Math.random() * 10;
-
+        let x = centerX, y = centerY, opacity = 1, life = 30 + Math.random() * 10;
         function animateParticle() {
-          if (life <= 0 || opacity <= 0) {
-            particle.remove();
-            return;
-          }
-
+          if (life <= 0 || opacity <= 0) { particle.remove(); return; }
           x += vx + (Math.random() - 0.5) * 1.2;
           y += vy + (Math.random() - 0.5) * 1.2;
-          opacity -= 0.03;
-          life--;
-
+          opacity -= 0.03; life--;
           particle.style.left = x + 'px';
           particle.style.top = y + 'px';
           particle.style.opacity = opacity;
-
           requestAnimationFrame(animateParticle);
         }
-
         animateParticle();
       }
     }
 
     function animate() {
-      const dx = targetX - lastX;
-      const dy = targetY - lastY;
+      const dx = targetX - lastX, dy = targetY - lastY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist > 0.5) {
-        createParticles(dx, dy);
-      }
-
+      if (dist > 0.5 && musicPlayed) createParticles(dx, dy);
       lastX += dx * followSpeed;
       lastY += dy * followSpeed;
-
       follower.style.left = lastX + 'vw';
       follower.style.top = lastY + 'vh';
-
       requestAnimationFrame(animate);
     }
-
     animate();
+
+    // === INICIALIZACIÓN ===
+    window.addEventListener('load', () => {
+      initBattery();
+      setTimeout(() => {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => createHeartParticle(), i * 200);
+        }
+      }, 1000);
+    });
   </script>
 </body>
-</html> 
+</html>
